@@ -36,7 +36,7 @@
 #include <net/if.h>
 #include <net/if_arp.h>
 #include <net/route.h>
-#include <pthread.h>
+
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,18 +66,11 @@ char net_buf[512];       //收发buf
   *             
   * @retval   : 
   */
-int tcp_server_start(void)
+int tcp_server_start(pthread_t *tid)
 {
-	pthread_t tid_tcp_server;
-	void *thread_socket_rev = NULL;
-
-
-	if (pthread_create(&tid_lcd, NULL, (void*)thread_display_device_info, NULL))
+	if (pthread_create(tid, NULL, (void*)thread_tcp_server, NULL))
     exit(-1);
-
-	pthread_join(tid_tcp_server, &thread_socket_rev);
-	if (*(int*)thread_socket_rev == -1)
-		return -1;
+  return 0;
 }
 
 

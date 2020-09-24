@@ -19,8 +19,11 @@
 #ifndef __MENU_H__
 #define __MENU_H__
 
+#include <pthread.h>
 
-int display_device_info_start(void);
+
+int display_device_info_start(pthread_t *tid);
+void *thread_display_device_info(void *arg);
 
 
 

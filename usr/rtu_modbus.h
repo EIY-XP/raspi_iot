@@ -20,6 +20,7 @@
 #ifndef __RTU_MODBUS_H
 #define __RTU_MODBUS_H
 
+#include <pthread.h>
 
 /*常用功能码*/
 #define MB_ADDRESS_BROADCAST    ( 0 )   /*! Modbus broadcast address. */
@@ -123,7 +124,7 @@ typedef enum
 	MB_ETIMEDOUT         /*!< timeout error occurred. */
 } eMBErrorCode;
 
-int modbus_poll_start(void);
+int modbus_poll_start(pthread_t *tid);
 void rtu_bus_status(char new_status);
 int func03H_send_message(char* frames, unsigned short int slave_addr, unsigned short int read_addr, unsigned short int read_num);
 void *thread_modbus_poll(void *arg);

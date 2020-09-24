@@ -34,7 +34,7 @@ OBJ = ${patsubst %.c,%.o,${SRC}}
 #设置编译参数以及目标文件名称 使用gcc编译 使用-g参数便于使用gdb调试
 CC = gcc
 CCFLAGS = -g -Wall ${INC_DIR}
-TARGET = eiy_iot
+TARGET = raspi_iot
 
 #将所有的.o文件链接成目标文件
 ${TARGET}:${OBJ}

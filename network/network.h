@@ -22,6 +22,7 @@
 #define __NET_WORK_H
 
 /* Includes ------------------------------------------------------------------*/
+#include <pthread.h>
 
 /* Exported macro ------------------------------------------------------------*/
 #define IP_LENGTH   16
@@ -33,14 +34,12 @@
 
 /* Exported functions ------------------------------------------------------- */
 
-int tcp_server_start(void);
+int tcp_server_start(pthread_t *tid);
 int get_local_ipv4_address(const char *eth_name, char *ip_addr);
 int set_local_ipv4_address(const char *eth_name, const char *ip_addr);
 int get_loacl_mac_address(const char *eth_name, char *mac_addr);
 int set_local_mac_address(const char *eth_name, const char *mac_addr);
 void *thread_tcp_server(void *arg);
-
-
 
 
 

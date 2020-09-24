@@ -34,7 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <pthread.h>
+
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,18 +65,12 @@ double sensor_hum = 0.0;
   * @param    : 
   * @retval   : 
   */
-int modbus_poll_start(void)
+int modbus_poll_start(pthread_t *tid)
 {
-	pthread_t tid_modbus;
-	void *thread_modbus_rev = NULL;
-	
 	sem_init(&sem_sensor, 0, 1); //信号量初始化
-	if (pthread_create(&tid_modbus, NULL, (void*)thread_modbus_poll,  com_port))
+	if (pthread_create(tid, NULL, (void*)thread_modbus_poll, NULL))
 	   exit(-1);
-
-	pthread_join(tid_modbus, &thread_modbus_rev);
-	if (*(int*)thread_modbus_rev == -1)  //线程异常退出
-		return -1;
+	return 0;
 }
 
 
@@ -159,7 +153,7 @@ void *thread_modbus_poll(void *arg)
 	unsigned short int crc16;
 	unsigned short int length;
 
-	if ((fd = serialOpen(arg, 115200)) < 0)
+	if ((fd = serialOpen(uart_port, 115200)) < 0)
 	{
 		pthread_exit((void*)-1);
 	}

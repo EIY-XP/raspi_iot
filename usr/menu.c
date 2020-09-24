@@ -30,7 +30,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <pthread.h>
+
 
 
 
@@ -118,8 +118,6 @@ void display_modbus(void);
 
 
 
-
-	
 /**
 	* @function : display_device_info_start
 	* @author 	: xp
@@ -127,14 +125,12 @@ void display_modbus(void);
 	* @param		: 
 	* @retval 	: 
 	*/
-int display_device_info_start(void)
+int display_device_info_start(pthread_t *tid)
 {
-	pthread_t tid_lcd;
-
-	if (pthread_create(&tid_tcp_server, NULL, (void*)thread_tcp_server, NULL))
+	lcd_init();
+	if (pthread_create(tid, NULL, (void*)thread_display_device_info, NULL))
     exit(-1);  //退出进程
-
-	pthread_detach(tid_lcd);	
+  return 0;
 }
 
 

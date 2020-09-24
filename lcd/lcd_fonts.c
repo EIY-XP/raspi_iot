@@ -48,17 +48,17 @@ unsigned char* hollow_dot = (unsigned char*)"○";  //用于终端打印 “无�
  ASCII8x16字符集
  该字符集存放在lcd/fonts文件夹中 每个字符 使用16个字节存储
  */
-const char* asc16_path = "/home/pi/workstation/eiy-project/pi-iot/lcd/fonts/ASC16";
+const char* asc16_path = "/home/pi/workstation/eiy-project/raspi-iot/lcd/fonts/ASC16";
 /*
  ASCII24x48字符集
  该字符集存放在lcd/fonts文件夹中 每个字符 使用48个字节存储
  */
-const char* asc48_path = "/home/pi/workstation/eiy-project/pi-iot/lcd/fonts/ASC48";
+const char* asc48_path = "/home/pi/workstation/eiy-project/raspi-iot/lcd/fonts/ASC48";
 /*
  ASCII16x16字符集
  该字符集存放在lcd/fonts文件夹中 每个字符 使用32个字节存储
  */
-const char* hzk16_path = "/home/pi/workstation/eiy-project/pi-iot/lcd/fonts/HZK16";
+const char* hzk16_path = "/home/pi/workstation/eiy-project/raspi-iot/lcd/fonts/HZK16";
 
 /*
  raspberry logo  50x60
