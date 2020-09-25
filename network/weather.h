@@ -22,6 +22,7 @@
 #define __WEATHER_H
 
 /* Includes ------------------------------------------------------------------*/
+#include <pthread.h>
 
 /* Exported macro ------------------------------------------------------------*/
 
@@ -47,10 +48,8 @@ typedef struct
 }tWeather;
 
 
-int get_weather(char *weather_json, char *location, tWeather *result);
-void display_weather_test(void);
-
-
+int get_weather_info_start(pthread_t *tid);
+void *pthread_get_weather(void *arg);
 
 
 

@@ -24,6 +24,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "weather.h"
 #include "cJSON.h"
+#include "../delay/delay.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -38,6 +39,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <net/if.h>
+#include <errno.h>
+
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +51,7 @@
 #define  WEATHER_IP_ADDR   "116.62.81.138"
 #define  WEATHER_PORT	   80
 
-/* - 心知天气网注册秘钥 该密码有误 请自行注册 x- */
+/* - 心知天气网注册秘钥 该密码有误 请自行注册 x - */
 #define  KEY    "SxgSHnS8uOV7JBY7Q"		// 这是在心知天气注册后，每个用户自己的一个key
 
 /* GET请求包 */
@@ -58,7 +61,9 @@
 /* JSON数据包 还可以用更多其他的天气数据包可查阅心知天气*/	
 #define  NOW_JSON     "now"
 
-
+/* 提取后的天气数据 */	
+tWeather weather_data = {0};
+pthread_mutex_t weather_mutex = PTHREAD_MUTEX_INITIALIZER; //互斥锁
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -71,17 +76,64 @@
 /* Private functions ---------------------------------------------------------*/
 
 static int cJSON_nowWeatherParse(char *JSON, tWeather *result);
+int get_weather(char *location, char *weather_json, tWeather *result);
+
+
+/**
+	* @function : get_weather_info_start
+	* @author 	: xp
+	* @brief		: 
+	* @param		: 
+	* @retval 	: 
+	*/
+int get_weather_info_start(pthread_t *tid)
+{
+	if (pthread_create(tid, NULL, (void*)pthread_get_weather, NULL))
+    exit(-1);  //退出进程
+  return 0;
+}
+
+
+/**
+  * @function : pthread_get_weather
+  * @author   : xp
+  * @brief    : 获取天气信息的线程
+  * @param    : 
+  * @retval   : 
+  */
+void *pthread_get_weather(void *arg)
+{
+	int ret;
+	char *location = "HangZhou";
+	char *now_weather = "now";   //实时天气
+
+	while (1)
+	{
+		memset(&weather_data, 0, sizeof(weather_data));
+		
+		pthread_mutex_lock(&weather_mutex);
+		ret = get_weather(location, now_weather, &weather_data);
+		pthread_mutex_unlock(&weather_mutex);
+		
+		if (-1 == ret)
+			printf("get weather error\n");
+
+		delay_sec(600);
+	}
+
+}
 
 
 /**
   * @function : get_weather
   * @author   : xp
   * @brief    : 
-  * @param    : 
+  * @param    : *location 地区, *weather_json 获取天气类型, *result 返回数据结构体
   * @retval   : 
   */
-int get_weather(char *weather_json, char *location, tWeather *result)
+int get_weather(char *location, char *weather_json, tWeather *result)
 {
+	int ret;
 	int sock_fd;
 	int sendbytes;
   char GetRequestBuf[256] = {0};
@@ -108,15 +160,26 @@ int get_weather(char *weather_json, char *location, tWeather *result)
 		return -1;
   }
   
-  recv(sock_fd, WeatherRecvBuf, 1024, 0);    
-//  printf("Server return data is:\n %s\n",WeatherRecvBuf);    
-  /* 解析天气数据并保存到结构体变量weather_data中 */
-  if (0 == strcmp(weather_json, NOW_JSON))        // 天气实况
-  {
-    if (0 != (cJSON_nowWeatherParse(WeatherRecvBuf, result)))
-    	return -1;
-  }
-    
+  ret = recv(sock_fd, WeatherRecvBuf, 1024, 0);  
+	if (ret > 0)
+	{
+//		printf("Server return data is:\n %s\n",WeatherRecvBuf);    
+  	/* 解析天气数据并保存到结构体变量weather_data中 */
+  	if (0 == strcmp(weather_json, NOW_JSON))        // 天气实况
+  	{
+    	if (0 != (cJSON_nowWeatherParse(WeatherRecvBuf, result)))
+    	{
+				close(sock_fd);
+    		return -1;
+    	}	
+ 		}
+	}
+	else
+	{
+		close(sock_fd);
+		return -1;
+	}
+ 
   close(sock_fd);
   return 0;
 }
@@ -225,11 +288,10 @@ static int cJSON_nowWeatherParse(char *JSON, tWeather *result)
   */
 void display_weather_test(void)
 {
-	tWeather weather_data = {0};
 	char *location = "HangZhou";
 
 	memset(&weather_data, 0, sizeof(weather_data));   // weather_data清零 
-	get_weather(NOW_JSON, location, &weather_data);   // GET 并解析实况天气数据
+	get_weather(location, NOW_JSON, &weather_data);   // GET 并解析实况天气数据
 	
 	printf("============%s today weather===========\n", weather_data.name);
 	printf("weather_data->text: %s\n", weather_data.text);	

@@ -124,9 +124,8 @@ typedef enum
 	MB_ETIMEDOUT         /*!< timeout error occurred. */
 } eMBErrorCode;
 
-int modbus_poll_start(pthread_t *tid);
-void rtu_bus_status(char new_status);
-int func03H_send_message(char* frames, unsigned short int slave_addr, unsigned short int read_addr, unsigned short int read_num);
+
+int rtu_modbus_poll_start(pthread_t *tid);
 void *thread_modbus_poll(void *arg);
 
 

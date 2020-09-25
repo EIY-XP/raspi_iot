@@ -23,8 +23,8 @@
 
 
 void get_iot_version(int *major, int *minor);
-void get_system_calendar(void);
-int get_cpu_temp(void);
+void get_system_calendar(char **date_p, char **time_p, unsigned char *week_day);
+int get_cpu_temp(double *temp);
 
 
 #endif /* __SYSTEM_INFO_H */

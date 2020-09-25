@@ -17,21 +17,16 @@
   *	
   -----------------------------------------------------------------------------
 **/
-/* 项目自带头文件 */
+
 #include "includes.h"
 #include "../file/file.h"
 #include "../lcd/lcd_basic.h"
 #include "../lcd/lcd_driver.h"
 #include "../lcd/lcd_fonts.h"
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
-
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,18 +34,10 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-sem_t sem_sensor;
-
-double cpu_temp = 0;     //CPU温度值变量
-
-char date_str[20] = {0};	//日期
-char time_str[10] = {0};	//系统时间
-unsigned char week_day;  //星期
 char *week[7] = {"星期日","星期一","星期二","星期三","星期四","星期五","星期六"};
+const char eth0_ip[IP_LENGTH] = "192.168.137.88";  //有线网卡IP地址
+const char *LOG_FILE_PATH = "/home/pi/workstation/eiy-project/log/raspi_iot.txt";
 
-char eth0_ip[IP_LENGTH] = {0};  //有线网卡IP地址
-char wlan0_ip[IP_LENGTH] = {0}; //无线网卡IP地址
-char mac[MAC_LENGTH] = {0};      //MAC地址
 
 tBmp *weather_bmp[20] = 
 {
@@ -101,8 +88,6 @@ char *weather[20] =
 	"特大暴雨"
 };
 
-const char *LOGO_FILE_PATH = "/home/pi/workstation/eiy-project/log/pi-iot.txt";
-
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -110,12 +95,11 @@ const char *LOGO_FILE_PATH = "/home/pi/workstation/eiy-project/log/pi-iot.txt";
 
 /* Private functions ---------------------------------------------------------*/
 void display_menu(void);
-void display_weather(char *location, char *weather_json);
+void display_weather(void);
 void display_network_info(void);
 void display_cpu_temperature(void);
 void display_system_calendar(void);
 void display_modbus(void);
-
 
 
 /**
@@ -182,6 +166,7 @@ void display_menu(void)
 
 	lcd_set_font(&asc_font8x16_t);
 	lcd_display_srting(55, 5, (unsigned char*)"eth0 :");     //eth0
+	lcd_display_srting(104, 5, (unsigned char*)eth0_ip);       //eth0固定IP
 	lcd_display_srting(55, 23, (unsigned char*)"wlan0:");      //wlan0
 	lcd_display_srting(55, 41, (unsigned char*)"cpu temp:"); //cpu temp
 	lcd_display_temp_icon(145, 41, bmp16x16_tem_table);        //℃
@@ -209,18 +194,21 @@ void display_menu(void)
   * @param    : 
   * @retval   : 
   */
-void display_weather(char *location, char *weather_json)
+void display_weather(void)
 {
+	int flag,i;
 	unsigned short int color;
-	tWeather weather_data = {0};
 	unsigned short int weather_code = 0;
 
-	memset(&weather_data, 0, sizeof(weather_data));   // weather_data清零 
-	
-	if (0 == (get_weather(weather_json, location, &weather_data)))  // GET 并解析实况天气数据
+	for (i = 0; i < 2; i++)
 	{
+		if ((flag = pthread_mutex_trylock(&weather_mutex)) != 0)
+		{	
+			delay_sec(2);
+			continue;
+		}
+			
 		weather_code = atoi(weather_data.code);
-		
 		lcd_get_back_color(&color);   //获取背景颜色
 		lcd_set_font(&hzk_font16x16_t);
 		lcd_write_gram_region(2, 116, 62, 176,color);  //清空显示区
@@ -228,14 +216,17 @@ void display_weather(char *location, char *weather_json)
 		lcd_write_gram_region(113, 114, 177, 130, color);  //清空4个汉字显示区
 		lcd_display_chinese(113, 114, (char*)weather_data.name); //刷新城市名称
 		lcd_write_gram_region(113, 131, 177, 147, color);  //清空4个汉字显示区
-//		lcd_display_chinese(113, 131, (char*)weather_data.text);
+	//		lcd_display_chinese(113, 131, (char*)weather_data.text);
 		lcd_display_chinese(113, 131, weather[weather_code+1]); //刷新天气描述
 
 		lcd_set_font(&asc_font8x16_t);
 		lcd_write_gram_region(113, 148, 129, 164, color);  //清空1个汉字显示区
 		lcd_display_srting(113, 152, (unsigned char*)weather_data.temperature); //刷新气温
 		lcd_display_srting(145, 165, (unsigned char*)"N/A"); //刷新空气质量
+		pthread_mutex_unlock(&weather_mutex);
+		break;
 	}
+	
 }
 
 
@@ -250,29 +241,16 @@ void display_network_info(void)
 {
 	unsigned short int color;
 
-	const char *raspi_eth0 = "eth0";    //有线网卡名称
 	const char *raspi_wlan0 = "wlan0";  //无线网卡名称
+	char ip_addr[IP_LENGTH] = {0}; //无线网卡IP地址
 
 	lcd_get_back_color(&color);
 	lcd_set_font(&asc_font8x16_t);
-	
-	if (0 == get_local_ipv4_address(raspi_eth0, eth0_ip))
-	{
-		lcd_write_gram_region(104, 5, 224, 22, color); 
-		lcd_display_srting(104, 5, (unsigned char*)eth0_ip);
-		//	printf("local %s ip: %s\n", test_eth, eth0_ip);
-	}
-	else
-	{
-		lcd_write_gram_region(104, 5, 224, 22, color); 
-		lcd_display_srting(104, 5, (unsigned char*)"not connect");
-	}
 
-	if (0 == get_local_ipv4_address(raspi_wlan0, wlan0_ip))
+	if (0 == get_local_ipv4_address(raspi_wlan0, ip_addr))
 	{
 		lcd_write_gram_region(104, 23, 224, 39, color); 
-		lcd_display_srting(104, 23, (unsigned char*)wlan0_ip);
-		//	printf("local %s ip: %s\n", test_wlan, wlan0_ip);
+		lcd_display_srting(104, 23, (unsigned char*)ip_addr);
 	}
 	else
 	{
@@ -292,8 +270,9 @@ void display_network_info(void)
 void display_cpu_temperature(void)
 {
   char buf[10];
+  double cpu_temp = 0;     //CPU温度值变量
 
-  if (0 == get_cpu_temp())
+  if (0 == get_cpu_temp(&cpu_temp))
   {
 		sprintf(buf, "%d", (unsigned short int)cpu_temp); //1位精度输出
 		
@@ -314,8 +293,11 @@ void display_cpu_temperature(void)
 void display_system_calendar(void)
 {
 	char *chinese_in;
+	unsigned char week_day = 0;  //星期
+	char *date_str;	//日期
+	char *time_str;	//系统时间
 
-	get_system_calendar();
+	get_system_calendar(&date_str, &time_str, &week_day);
 	
 	lcd_set_font(&asc_font8x16_t);
 	lcd_display_srting(140, 70, (unsigned char*)date_str);
@@ -354,9 +336,7 @@ void display_modbus(void)
   */
 void *thread_display_device_info(void *arg)
 {
-	unsigned int   i;
-	char *location = "HangZhou";
-	char *now_weather = "now";   //实时天气
+	unsigned short int   i = 0, j = 0;
 
 	display_menu();
 	
@@ -364,32 +344,30 @@ void *thread_display_device_info(void *arg)
 	display_cpu_temperature();
 	display_system_calendar();
 	display_network_info();
-	display_weather(location, now_weather);
-	write_log_to_file((char*)"the pi-iot app start");
+	display_weather();
+	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
 	{
-		++i;
-		
-		if (0 == (i % 20)) //每20秒钟重新获取一次时间和CPU温度
-		{
-			display_system_calendar();
-			display_cpu_temperature();
-			display_modbus();
-		}
+		display_system_calendar();
+		display_cpu_temperature();
+		display_modbus();
 			
-		if (0 == (i % 600)) //每10分钟重新获取一次天气信息
+		if (i++ == 120) //每20分钟重新获取一次天气信息
 		{
-			display_weather(location, now_weather);
+			display_weather();
+			write_log_to_file((char*)"get weather ok");
+			i = 0;
 		}
 
-		if(0 == (i % 1800))  //每30分钟重新获取一次IP
+		if (j++ == 180)  //每30分钟重新获取一次IP
 		{
-			display_network_info();
-			write_log_to_file((char*)"the pi-iot app running ok");
+//			display_network_info();
+			write_log_to_file((char*)"the raspi_iot app is running");
+			j = 0;
 		}
 
-		delay_sec(1);
+		delay_sec(10);
 	}
 	
 	return NULL;

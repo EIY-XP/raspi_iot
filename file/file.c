@@ -38,7 +38,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 static pthread_mutex_t file_mutex = PTHREAD_MUTEX_INITIALIZER; //静态类型互斥量
-const char *LOGO_PATH = "/home/pi/workstation/eiy-project/log/pi-iot.log";
+const char *LOG_PATH = "/home/pi/workstation/eiy-project/log/raspi.log";
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,7 +115,7 @@ int write_log_to_file(char *format, ...)
 	va_list vlist;
 	char *fmt = NULL;
  
-	if (!(fp = fopen(LOGO_PATH, "a+"))) 
+	if (!(fp = fopen(LOG_PATH, "a+"))) 
 	{
 		pthread_mutex_unlock(&file_mutex);
 		return -1;

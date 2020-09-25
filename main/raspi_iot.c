@@ -45,7 +45,6 @@
 /* Private functions ---------------------------------------------------------*/
 int raspi_iot_init(void);
 
-
 /**
   * @function : main
   * @author   : xp
@@ -57,24 +56,20 @@ int main()
 {
 	pthread_t tid_lcd;
 	pthread_t tid_modbus;
-	pthread_t tid_tcp_server;
-	void *thread_modbus_ret = NULL;
-	void *thread_tcp_server_ret = NULL;
+	pthread_t tid_weather;
+	void *thread_weather_ret = NULL;
 	
 	if (raspi_iot_init() == -1)
 		exit(-1);
 
+	rtu_modbus_poll_start(&tid_modbus);
+	get_weather_info_start(&tid_weather);
 	display_device_info_start(&tid_lcd);
-	modbus_poll_start(&tid_modbus);
-	tcp_server_start(&tid_tcp_server);
-
+	
 	pthread_detach(tid_lcd);
-	pthread_join(tid_modbus, &thread_modbus_ret);
-	if (*(int*)thread_modbus_ret == -1)  //线程异常退出
-		exit(-1);
-		
-	pthread_join(tid_tcp_server, &thread_tcp_server_ret);
-	if (*(int*)thread_tcp_server_ret == -1)  //线程异常退出
+	pthread_detach(tid_modbus);
+	pthread_join(tid_weather, &thread_weather_ret);
+	if (*(int*)thread_weather_ret == -1)  //线程异常退出
 		exit(-1);
 	
 	while (1)

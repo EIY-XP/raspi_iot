@@ -42,6 +42,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 const char *TEMP_PATH = "/sys/class/thermal/thermal_zone0/temp";  //CPU温度查询文件
+char date_str[20] = {0};	//日期
+char time_str[10] = {0};	//系统时间
 
 /* Public variables ----------------------------------------------------------*/
 
@@ -73,7 +75,7 @@ void get_iot_version(int *major, int *minor)
   * @param    : 
   * @retval   : 
   */
-void get_system_calendar(void)
+void get_system_calendar(char **date_p, char **time_p, unsigned char *week_day)
 {
   /*
   struct tm {
@@ -129,7 +131,7 @@ void get_system_calendar(void)
   %z，%Z 时区名称，如果不能得到时区名称则返回空字符。
   %% 百分号
   */
-  
+
 	time_t raw_time;  //原始时间戳
   struct tm* time_info;
 
@@ -139,8 +141,11 @@ void get_system_calendar(void)
 
 	strftime(date_str, sizeof(date_str), "%F", time_info);
 	strftime(time_str, sizeof(time_str), "%R", time_info);
-	week_day = (unsigned char)time_info->tm_wday;
-		
+	
+	*week_day = (unsigned char)time_info->tm_wday;
+	*date_p = date_str;
+	*time_p = time_str;
+	
   #if 0
   printf("China:%2d:%02d\n", time_info->tm_hour+CCT, time_info->tm_min);
   printf("China:%4d/%02d/%02d/%d\n", time_info->tm_year+1900, time_info->tm_mon+1, time_info->tm_mday, time_info->tm_wday);
@@ -155,7 +160,7 @@ void get_system_calendar(void)
   * @param    : 
   * @retval   : 
   */
-int get_cpu_temp(void)
+int get_cpu_temp(double *temp)
 {
 	int fd;  //设备描述符
 	char buf[10];
@@ -181,7 +186,7 @@ int get_cpu_temp(void)
    转换为浮点数打印 
    使用atoi函数将所指向的字符串转换为一个整数(类型为 int 型) 再除1000保留小数点一位
   */
-  cpu_temp = atoi(buf) / 1000.0;
+  *temp = atoi(buf) / 1000.0;
 //  printf("temp:%.1f\n", cpu_temp);
 
 	return 0;

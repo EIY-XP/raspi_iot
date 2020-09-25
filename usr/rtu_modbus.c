@@ -57,19 +57,25 @@ double sensor_hum = 0.0;
 /* Exported function declare -------------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
+void rtu_bus_status(char new_status);
+int func03H_send_message(char* frames, unsigned short int slave_addr, unsigned short int read_addr, unsigned short int read_num);
+
+
+
 
 /**
-  * @function : modbus_poll_start
+  * @function : rtu_modbus_poll_start
   * @author   : xp
   * @brief    : 
   * @param    : 
   * @retval   : 
   */
-int modbus_poll_start(pthread_t *tid)
+int rtu_modbus_poll_start(pthread_t *tid)
 {
 	sem_init(&sem_sensor, 0, 1); //信号量初始化
 	if (pthread_create(tid, NULL, (void*)thread_modbus_poll, NULL))
 	   exit(-1);
+	   
 	return 0;
 }
 
@@ -132,9 +138,6 @@ int func03H_send_message(char* frames, unsigned short int slave_addr, unsigned s
 
   return index;
 }
-
-
-
 
 
 /**
