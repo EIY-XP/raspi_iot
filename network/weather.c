@@ -106,11 +106,10 @@ void *pthread_get_weather(void *arg)
 	int ret;
 	char *location = "HangZhou";
 	char *now_weather = "now";   //实时天气
+	memset(&weather_data, 0, sizeof(weather_data));
 
 	while (1)
 	{
-		memset(&weather_data, 0, sizeof(weather_data));
-		
 		pthread_mutex_lock(&weather_mutex);
 		ret = get_weather(location, now_weather, &weather_data);
 		pthread_mutex_unlock(&weather_mutex);
@@ -150,6 +149,7 @@ int get_weather(char *location, char *weather_json, tWeather *result)
   if(connect(sock_fd, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr)) == -1)
   {
 //		perror("connect fail!");
+		close(sock_fd);
 		return -1;
   }
   
@@ -157,6 +157,7 @@ int get_weather(char *location, char *weather_json, tWeather *result)
   if((sendbytes = send(sock_fd, GetRequestBuf, strlen(GetRequestBuf), 0)) == -1)
   {
 //		perror("send fail");
+		close(sock_fd);
 		return -1;
   }
   
@@ -166,13 +167,11 @@ int get_weather(char *location, char *weather_json, tWeather *result)
 //		printf("Server return data is:\n %s\n",WeatherRecvBuf);    
   	/* 解析天气数据并保存到结构体变量weather_data中 */
   	if (0 == strcmp(weather_json, NOW_JSON))        // 天气实况
-  	{
     	if (0 != (cJSON_nowWeatherParse(WeatherRecvBuf, result)))
     	{
 				close(sock_fd);
     		return -1;
     	}	
- 		}
 	}
 	else
 	{

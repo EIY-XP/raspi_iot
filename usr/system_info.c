@@ -180,15 +180,17 @@ int get_cpu_temp(double *temp)
 		close(fd);
 		return -1;
  	}
-
-
-  /* 
-   转换为浮点数打印 
-   使用atoi函数将所指向的字符串转换为一个整数(类型为 int 型) 再除1000保留小数点一位
-  */
-  *temp = atoi(buf) / 1000.0;
-//  printf("temp:%.1f\n", cpu_temp);
-
+ 	else
+ 	{
+		/* 
+    转换为浮点数打印 
+    使用atoi函数将所指向的字符串转换为一个整数(类型为 int 型) 再除1000保留小数点一位
+   	*/
+  	*temp = atoi(buf) / 1000.0;
+//		printf("temp:%.1f\n", *temp);
+ 	}
+ 		
+	close(fd);
 	return 0;
 }
 

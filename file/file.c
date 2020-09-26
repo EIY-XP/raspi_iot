@@ -50,9 +50,25 @@ int do_vasprintf(char **strp, const char *fmt, va_list ap);
 
 
 /**
+  * @function : write_file_test
+  * @author   : xp
+  * @brief    : 写文件测试 支持 参数的数量可变
+  * @param    : 
+  * @retval   : 
+  */
+int write_file_test(void)
+{
+	char *lib = "eiy_lib";
+	char *name = "sxp"
+	
+	write_log_to_file("welcome to the %s, the author is %s", lib ,name);
+}
+
+
+/**
   * @function : write_data_to_file
   * @author   : xp
-  * @brief    : 将数据写入指定的文件中
+  * @brief    : 将数据写入指定的文件中 未添加互斥锁
   * @param    : 
   * @retval   : 
   */
@@ -152,5 +168,5 @@ int write_log_to_file(char *format, ...)
 
 
 
- 
 /*---------------------------------The End------------------------------------*/
+

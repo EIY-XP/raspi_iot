@@ -43,7 +43,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 const char *uart_port = "/dev/ttyAMA1";
-char mb_frames_buf[100] = {0};
+char mb_frames_buf[256] = {0};
 static char send_status = 0;
 static char rev_status = 0;
 
@@ -62,7 +62,6 @@ int func03H_send_message(char* frames, unsigned short int slave_addr, unsigned s
 
 
 
-
 /**
   * @function : rtu_modbus_poll_start
   * @author   : xp
@@ -78,7 +77,6 @@ int rtu_modbus_poll_start(pthread_t *tid)
 	   
 	return 0;
 }
-
 
 
 /**

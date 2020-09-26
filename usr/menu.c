@@ -144,7 +144,7 @@ void lcd_display_ascii_test(void)
 /**
   * @function : display_menu
   * @author   : xp
-  * @brief    : 
+  * @brief    : LCD菜单
   * @param    : 
   * @retval   : 
   */
@@ -182,7 +182,7 @@ void display_menu(void)
 	lcd_display_chinese(65, 131, (char*)"天气");     //天气
 	lcd_display_chinese(65, 148, (char*)"气温");     //气温
 	lcd_display_chinese(65, 165, (char*)"空气质量");
-	lcd_ctr_backlight(ENABLE);
+//	lcd_ctr_backlight(ENABLE);
 	lcd_display_temp_icon(130, 148, bmp16x16_tem_table); //℃
 }
 
@@ -190,18 +190,19 @@ void display_menu(void)
 /**
   * @function : display_weather
   * @author   : xp
-  * @brief    : 
+  * @brief    : 显示天气信息
   * @param    : 
   * @retval   : 
   */
 void display_weather(void)
 {
-	int flag,i;
+	int flag = 0, i = 0;
 	unsigned short int color;
 	unsigned short int weather_code = 0;
 
 	for (i = 0; i < 2; i++)
 	{
+		/* 为了防止 获取天气信息 的线程挂掉导致互斥量无法释放 最多尝试2次获取 */
 		if ((flag = pthread_mutex_trylock(&weather_mutex)) != 0)
 		{	
 			delay_sec(2);
@@ -212,28 +213,28 @@ void display_weather(void)
 		lcd_get_back_color(&color);   //获取背景颜色
 		lcd_set_font(&hzk_font16x16_t);
 		lcd_write_gram_region(2, 116, 62, 176,color);  //清空显示区
-		lcd_display_icon(2, 116, weather_bmp[weather_code+1]); //刷新天气图标信息
+		lcd_display_icon(2, 116, weather_bmp[weather_code+1]);    //刷新天气图标信息
 		lcd_write_gram_region(113, 114, 177, 130, color);  //清空4个汉字显示区
 		lcd_display_chinese(113, 114, (char*)weather_data.name); //刷新城市名称
 		lcd_write_gram_region(113, 131, 177, 147, color);  //清空4个汉字显示区
 	//		lcd_display_chinese(113, 131, (char*)weather_data.text);
-		lcd_display_chinese(113, 131, weather[weather_code+1]); //刷新天气描述
+		lcd_display_chinese(113, 131, weather[weather_code+1]);   //刷新天气描述
 
 		lcd_set_font(&asc_font8x16_t);
-		lcd_write_gram_region(113, 148, 129, 164, color);  //清空1个汉字显示区
+		lcd_write_gram_region(113, 148, 129, 164, color);      //清空1个汉字显示区
 		lcd_display_srting(113, 152, (unsigned char*)weather_data.temperature); //刷新气温
 		lcd_display_srting(145, 165, (unsigned char*)"N/A"); //刷新空气质量
 		pthread_mutex_unlock(&weather_mutex);
-		break;
+		
+		break; //如果第一次就能顺利获取 则跳出
 	}
-	
 }
 
 
 /**
   * @function : display_network_info
   * @author   : xp
-  * @brief    : 网络信息
+  * @brief    : 网卡信息
   * @param    : 
   * @retval   : 
   */
@@ -242,7 +243,7 @@ void display_network_info(void)
 	unsigned short int color;
 
 	const char *raspi_wlan0 = "wlan0";  //无线网卡名称
-	char ip_addr[IP_LENGTH] = {0}; //无线网卡IP地址
+	char ip_addr[IP_LENGTH] = {0};       //无线网卡IP地址
 
 	lcd_get_back_color(&color);
 	lcd_set_font(&asc_font8x16_t);
@@ -263,7 +264,7 @@ void display_network_info(void)
 /**
   * @function : display_cpu_temperature
   * @author   : xp
-  * @brief    : LCD显示CPU当前温度
+  * @brief    : CPU当前温度
   * @param    : 
   * @retval   : 
   */
@@ -327,6 +328,7 @@ void display_modbus(void)
   lcd_display_srting(52, 300, (unsigned char*)hum_buf);
 }
 
+
 /**
   * @function : thread_display_device_info
   * @author   : xp
@@ -339,12 +341,12 @@ void *thread_display_device_info(void *arg)
 	unsigned short int   i = 0, j = 0;
 
 	display_menu();
-	
-	delay_sec(10);
+	delay_sec(12);
 	display_cpu_temperature();
 	display_system_calendar();
 	display_network_info();
 	display_weather();
+	lcd_ctr_backlight(ENABLE);
 	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
