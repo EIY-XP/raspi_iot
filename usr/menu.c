@@ -20,9 +20,7 @@
 
 #include "includes.h"
 #include "../file/file.h"
-#include "../lcd/lcd_basic.h"
-#include "../lcd/lcd_driver.h"
-#include "../lcd/lcd_fonts.h"
+
 
 #include <stdio.h>
 #include <string.h>
@@ -182,7 +180,7 @@ void display_menu(void)
 	lcd_display_chinese(65, 131, (char*)"天气");     //天气
 	lcd_display_chinese(65, 148, (char*)"气温");     //气温
 	lcd_display_chinese(65, 165, (char*)"空气质量");
-//	lcd_ctr_backlight(ENABLE);
+	lcd_ctr_backlight(ENABLE);
 	lcd_display_temp_icon(130, 148, bmp16x16_tem_table); //℃
 }
 
@@ -283,7 +281,6 @@ void display_cpu_temperature(void)
 }
 
 
-
 /**
   * @function : display_system_calendar
   * @author   : xp
@@ -346,7 +343,7 @@ void *thread_display_device_info(void *arg)
 	display_system_calendar();
 	display_network_info();
 	display_weather();
-	lcd_ctr_backlight(ENABLE);
+	
 	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
@@ -354,15 +351,17 @@ void *thread_display_device_info(void *arg)
 		display_system_calendar();
 		display_cpu_temperature();
 		display_modbus();
-			
-		if (i++ == 120) //每20分钟重新获取一次天气信息
+
+		/* 每20分钟重新获取一次天气信息 */	
+		if (i++ == 120) 
 		{
 			display_weather();
 			write_log_to_file((char*)"get weather ok");
 			i = 0;
 		}
 
-		if (j++ == 180)  //每30分钟重新获取一次IP
+		/* 每30分钟重新获取一次IP */
+		if (j++ == 180)  
 		{
 //			display_network_info();
 			write_log_to_file((char*)"the raspi_iot app is running");

@@ -46,7 +46,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 #define SPI_CHAN 0
-#define SPI_SPEED 10   //单位MHz 建议使用1M 10M 15.6M 31.2M (最高为32Mhz)
+#define SPI_SPEED 25   //单位MHz 建议使用1M 10M 15.6M 31.2M (最高为32Mhz)
 /* Private variables ---------------------------------------------------------*/
 static int spi_fd;
 static tLCDdevice lcd_dev_t;

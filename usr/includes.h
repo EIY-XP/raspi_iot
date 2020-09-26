@@ -40,6 +40,11 @@
 #include "../network/network.h"
 #include "../network/weather.h"
 
+#include "../lcd/lcd_basic.h"
+#include "../lcd/lcd_driver.h"
+#include "../lcd/lcd_fonts.h"
+
+
 
 
 

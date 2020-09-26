@@ -59,9 +59,10 @@ int do_vasprintf(char **strp, const char *fmt, va_list ap);
 int write_file_test(void)
 {
 	char *lib = "eiy_lib";
-	char *name = "sxp"
+	char *name = "sxp";
 	
 	write_log_to_file("welcome to the %s, the author is %s", lib ,name);
+	return 0;
 }
 
 
@@ -76,10 +77,7 @@ int write_data_to_file(const char *file_path, char *str)
 {
 	FILE *fd = fopen(file_path, "a+");
 	if (NULL == fd)
-	{
-		printf("fd is null or open file fail\n");
 		return -1;
-	}
 
 	if (str && (str[0] != 0))
 	{
@@ -105,8 +103,7 @@ int do_vasprintf(char **strp, const char *fmt, va_list ap)
 {
 	int ret;
  
-	ret = vasprintf(strp, fmt, ap);
-	if (-1 == ret)
+	if (-1 == (ret = vasprintf(strp, fmt, ap)))
 	{
 		printf("Failed to vasprintf: %s. Bailing out\n", strerror(errno));
 		return -1;
@@ -114,7 +111,8 @@ int do_vasprintf(char **strp, const char *fmt, va_list ap)
 	
 	return ret;
 }
- 
+
+
 
 /**
   * @function : write_log_to_file
@@ -125,31 +123,41 @@ int do_vasprintf(char **strp, const char *fmt, va_list ap)
   */
 int write_log_to_file(char *format, ...)
 {
-	pthread_mutex_lock(&file_mutex);
- 
+	int ret;
 	FILE *fp = NULL;
 	va_list vlist;
 	char *fmt = NULL;
- 
-	if (!(fp = fopen(LOG_PATH, "a+"))) 
+
+ 	pthread_mutex_lock(&file_mutex);
+ 	
+	if (0 == (fp = fopen(LOG_PATH, "a+"))) 
 	{
 		pthread_mutex_unlock(&file_mutex);
 		return -1;
 	}
  
 	va_start(vlist, format);
-	do_vasprintf(&fmt, format, vlist);
+	if (-1 == (ret = do_vasprintf(&fmt, format, vlist)))
+	{
+		va_end(vlist);
+		fclose(fp);
+		pthread_mutex_unlock(&file_mutex);
+		return -1;
+	}
 	va_end(vlist);
+	
 	if (!fmt)
 	{
+		fclose(fp);
 		pthread_mutex_unlock(&file_mutex);
 		return -1;
 	}
  
-	time_t raw_time;
+	time_t raw_time; //取系统时间
 	struct tm *ptm = NULL;
 	time(&raw_time);
 	ptm = localtime(&raw_time);
+	/*格式化写入数据*/
 	fprintf(fp, "[%04d-%02d-%02d-%02d-%02d-%02d] %s\n",
 					ptm->tm_year + 1900,
 					ptm->tm_mon + 1,
@@ -159,13 +167,13 @@ int write_log_to_file(char *format, ...)
 					ptm->tm_sec,
 					fmt);
  
-	free(fmt);
-	fsync(fileno(fp));
+	free(fmt); //由于vasprintf()采用的是动态申请内存的方式 所以需要释放
+	fsync(fileno(fp)); //写同步
 	fclose(fp);
 	pthread_mutex_unlock(&file_mutex);
+	
 	return 0;
 } 
-
 
 
 /*---------------------------------The End------------------------------------*/
