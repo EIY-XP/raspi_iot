@@ -32,6 +32,7 @@
 /* Exported functions ------------------------------------------------------- */
 
 int write_data_to_file(const char *file_path, char *str);
+int read_data_from_file(const char *file_path, char *str);
 int write_log_to_file(char *format, ...);
 
 

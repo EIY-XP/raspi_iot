@@ -34,7 +34,7 @@
 /* Private variables ---------------------------------------------------------*/
 char *week[7] = {"星期日","星期一","星期二","星期三","星期四","星期五","星期六"};
 const char eth0_ip[IP_LENGTH] = "192.168.137.88";  //有线网卡IP地址
-const char *LOG_FILE_PATH = "/home/pi/workstation/eiy-project/log/raspi_iot.txt";
+const char *LOG_FILE_PATH = "/home/pi/workstation/eiy-project/config/raspi_iot.txt";
 
 
 tBmp *weather_bmp[20] = 
@@ -148,7 +148,7 @@ void lcd_display_ascii_test(void)
   */
 void display_menu(void)
 {
-	lcd_set_text_color(COLOR_BLUE);
+	lcd_set_text_color(COLOR_BLUE2);
 	/*raspberryPi logo*/
 	lcd_display_icon(2, 2, &bmp50x60_raspberry_t);
 	/*上中横线*/
@@ -344,7 +344,7 @@ void *thread_display_device_info(void *arg)
 	display_network_info();
 	display_weather();
 	
-	write_log_to_file((char*)"the raspi_iot app start");
+//	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
 	{
@@ -353,7 +353,7 @@ void *thread_display_device_info(void *arg)
 		display_modbus();
 
 		/* 每20分钟重新获取一次天气信息 */	
-		if (i++ == 120) 
+		if (i++ == 60) 
 		{
 			display_weather();
 			write_log_to_file((char*)"get weather ok");
@@ -364,7 +364,7 @@ void *thread_display_device_info(void *arg)
 		if (j++ == 180)  
 		{
 //			display_network_info();
-			write_log_to_file((char*)"the raspi_iot app is running");
+//			write_log_to_file((char*)"the raspi_iot app is running");
 			j = 0;
 		}
 

@@ -38,7 +38,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 static pthread_mutex_t file_mutex = PTHREAD_MUTEX_INITIALIZER; //静态类型互斥量
-const char *LOG_PATH = "/home/pi/workstation/eiy-project/log/raspi.log";
+const char *LOG_PATH = "/home/pi/workstation/eiy-project/config/raspi.log";
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,6 +89,38 @@ int write_data_to_file(const char *file_path, char *str)
 	fclose(fd);
 	return 0;
 }
+
+
+
+/**
+  * @function : read_data_from_file
+  * @author   : xp
+  * @brief    : 从文件中读取数据到缓冲区
+  * @param    : 
+  * @retval   : 
+  */
+int read_data_from_file(const char *file_path, char *str)
+{
+	int ret;
+	unsigned short int pos;
+	FILE *fd = fopen(file_path, "r");
+	if (NULL == fd)
+		return -1;
+
+	fseek(fd, 0, SEEK_END);
+	pos = ftell(fd);
+	fseek(fd, 0, SEEK_SET);
+	ret = fread(str, pos, 1, fd);
+	if (ret <= 0)
+	{
+		fclose(fd);
+		return -1;
+	}
+	str[pos] = '\0';
+	fclose(fd);
+	return 0;
+}
+
 
 
 

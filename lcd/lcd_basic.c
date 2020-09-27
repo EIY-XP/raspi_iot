@@ -170,7 +170,7 @@ void lcd_set_icon(tBmp *icon)
 void lcd_init(void)
 {
   lcd_lowlevel_init();
-  lcd_set_color(COLOR_BLUE, COLOR_WHITE);
+  lcd_set_color(COLOR_BLUE2, COLOR_WHITE);
   lcd_clear(current_back_color);
   lcd_set_font(current_font);
   lcd_set_icon(current_icon);
