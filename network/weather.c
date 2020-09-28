@@ -70,9 +70,8 @@ tWeather weather_data = {0};
 tConfig weather_cfg = {0};
 pthread_mutex_t weather_mutex = PTHREAD_MUTEX_INITIALIZER; //互斥锁
 
-/*配置文件*/
+/*天气配置文件 程序启动后读取一次配置文件*/
 const char *CFG_PATH = "/home/pi/workstation/eiy-project/config/weather.json";
-
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -99,19 +98,13 @@ int get_weather(char *location, char *weather_json, tWeather *result);
 int get_weather_info_start(pthread_t *tid)
 {
 	int ret = 0;
-	char config_buf[1024] = {0};
+	char config_buf[512] = {0};
 
-	printf("weather info start\n");
 	if (0 == (ret = read_data_from_file(CFG_PATH, config_buf)))
 	{
 		printf("weather_json is :%s\n", config_buf);
-		printf("get weather json is ok\n");
 		if (0 == (ret = cJSON_weatherConfig(config_buf, &weather_cfg)))
-		{
-			printf("the location is:%s\n", weather_cfg.location);
-			printf("the weather_json:is %s\n", weather_cfg.weather_json);
-			printf("the time_per is:%s\n", weather_cfg.update_per);
-			
+		{			
 			if (pthread_create(tid, NULL, (void*)pthread_get_weather, (void*)&weather_cfg))
     		return -1;  //退出进程
 		}
@@ -135,13 +128,12 @@ int get_weather_info_start(pthread_t *tid)
 void *pthread_get_weather(void *arg)
 {
 	int ret = 0;
-	tConfig *cfg;
-	cfg = (tConfig*)arg;
+	tConfig *cfg = (tConfig*)arg;
 //	char *location = "HangZhou";
 //	char *now_weather = "now";   //实时天气
 	char *location = cfg->location;
 	char *now_weather = cfg->weather_json;   //实时天气
-	unsigned char time_str = (atoi(cfg->update_per)) * 60;
+	unsigned short int tim_per = (atoi(cfg->update_per)) * 60;
 	memset(&weather_data, 0, sizeof(weather_data));
 
 	while (1)
@@ -153,7 +145,7 @@ void *pthread_get_weather(void *arg)
 		if (-1 == ret)
 			printf("get weather failed\n");
 
-		delay_sec(time_str);
+		delay_sec(tim_per);
 	}
 
 }
@@ -324,7 +316,7 @@ static int cJSON_nowWeatherParse(char *JSON, tWeather *result)
   */
 static int cJSON_weatherConfig(char *JSON, tConfig *cfg)
 {
-	cJSON *json,*arrayItem,*object,*subobject,*item;
+	cJSON *json,*array_Item,*object,*sub_object,*item;
 
 	json = cJSON_Parse(JSON); //解析JSON数据包
 	if(json == NULL)			    //检测JSON数据包是否存在语法上的错误，返回NULL表示数据包无效
@@ -334,43 +326,45 @@ static int cJSON_weatherConfig(char *JSON, tConfig *cfg)
 	}
 	else
 	{
-		if((arrayItem = cJSON_GetObjectItem(json,"config")) != NULL)
+		if((array_Item = cJSON_GetObjectItem(json,"config")) != NULL)
 		{
-			cJSON_GetArraySize(arrayItem); 		//获取数组中对象个数
+			cJSON_GetArraySize(array_Item); 		//获取数组中对象个数
 			
-			if((object = cJSON_GetArrayItem(arrayItem, 0)) != NULL)//获取父对象内容
+			if((object = cJSON_GetArrayItem(array_Item, 0)) != NULL)//获取父对象内容
 			{
 				/* 匹配子对象1：城市地区相关 */
-				if((subobject = cJSON_GetObjectItem(object,"weather_cfg")) != NULL)
+				if((sub_object = cJSON_GetObjectItem(object,"weather_cfg")) != NULL)
 				{
 					// 匹配id
-					if((item = cJSON_GetObjectItem(subobject,"id")) != NULL)	 
+					if((item = cJSON_GetObjectItem(sub_object,"id")) != NULL)	 
 					{
 						memcpy(cfg->id, item->valuestring,strlen(item->valuestring));	
 					}
 						// 匹配城市名
-					if((item = cJSON_GetObjectItem(subobject,"location")) != NULL) 
+					if((item = cJSON_GetObjectItem(sub_object,"location")) != NULL) 
 					{
 						memcpy(cfg->location, item->valuestring,strlen(item->valuestring));	
 					}
 					// 匹配城市所在的国家
-					if((item = cJSON_GetObjectItem(subobject,"country")) != NULL)
+					if((item = cJSON_GetObjectItem(sub_object,"country")) != NULL)
 					{
 						memcpy(cfg->country, item->valuestring,strlen(item->valuestring)); 
 					}
 					// 匹配天气类型
-					if((item = cJSON_GetObjectItem(subobject,"weather_json")) != NULL)	
+					if((item = cJSON_GetObjectItem(sub_object,"weather_json")) != NULL)	
 					{
 						memcpy(cfg->weather_json, item->valuestring,strlen(item->valuestring));	
 					}
 					// 匹配获取间隔时间
-					if((item = cJSON_GetObjectItem(subobject,"update_min")) != NULL)
+					if((item = cJSON_GetObjectItem(sub_object,"update_min")) != NULL)
 					{
 						memcpy(cfg->update_per, item->valuestring,strlen(item->valuestring));
 					}
 				}
 		 }
 	 }
+	 else
+	 	return -1;
  }
 
  return 0;

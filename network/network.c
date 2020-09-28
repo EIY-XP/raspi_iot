@@ -82,58 +82,31 @@ int tcp_server_start(pthread_t *tid)
   *             *ip_addr 获取的IP存放buf
   * @retval   : 
   */
-//int get_local_ipv4_address(const char *eth_name, char *ip_addr)
-//{
-//	int socket_fd;
-//	struct sockaddr_in sin;
-//	struct ifreq ifr;
-//
-//	if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-//		return -1;
-//
-//	memset(&ifr, 0, sizeof(ifr));
-//	strncpy(ifr.ifr_name, eth_name, IFNAMSIZ);
-//	ifr.ifr_name[IFNAMSIZ - 1] = 0;
-//
-//	if (ioctl(socket_fd, SIOCGIFADDR, &ifr) < 0)
-//	{
-//		close(socket_fd);
-//		return -1;
-//	}
-//
-//	memcpy(&sin, &ifr.ifr_addr, sizeof(sin));
-//	snprintf(ip_addr, IP_LENGTH, "%s", inet_ntoa(sin.sin_addr));//将地址格式转换成xxx.xxx.xxx.xxx
-//
-//	close(socket_fd);
-//	return 0;
-//}
-
 int get_local_ipv4_address(const char *eth_name, char *ip_addr)
 {
-	if (!eth_name && !ip_addr)
-		return -1;
-
-	struct ifreq ifr;
 	int socket_fd;
+	struct sockaddr_in sin;
+	struct ifreq ifr;
 
-	if ((socket_fd = socket(AF_INET, SOCK_DGRAM ,0)) < 0)
+	if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 		return -1;
 
 	memset(&ifr, 0, sizeof(ifr));
-	strncpy(ifr.ifr_name, eth_name, IF_NAMESIZE);
-	struct sockaddr_in sin;
-	if (ioctl(socket_fd, SIOCGIFADDR, &ifr) == -1)
+	strncpy(ifr.ifr_name, eth_name, IFNAMSIZ);
+	ifr.ifr_name[IFNAMSIZ - 1] = 0;
+
+	if (ioctl(socket_fd, SIOCGIFADDR, &ifr) < 0)
 	{
 		close(socket_fd);
 		return -1;
 	}
 
-	close(socket_fd);
 	memcpy(&sin, &ifr.ifr_addr, sizeof(sin));
-	snprintf(ip_addr, IP_LENGTH, "%s", inet_ntoa(sin.sin_addr));
+	snprintf(ip_addr, IP_LENGTH, "%s", inet_ntoa(sin.sin_addr));//将地址格式转换成xxx.xxx.xxx.xxx
+
+	close(socket_fd);
 	return 0;
 }
-
 
 
 

@@ -47,20 +47,20 @@ typedef struct
 	char last_update[32];		//最后一次更新的时间
 }tWeather;
 
+
 typedef struct
 {
 	/* 获取天气信息的配置 */
-	char id[10];				    //id
-	char update_per[10];		//本地更新间隔 单位(分钟)
+	char id[5];				    //id
+	char update_per[5];		//本地更新间隔 单位(分钟)
 	char location[32];		  //地名
 	char country[32];			  //国家
-	char weather_json[12];	//获取天气信息类型 比如"NOW"
+	char weather_json[12];	//获取天气信息类型 比如"now"
 }tConfig;
 
 
 int get_weather_info_start(pthread_t *tid);
 void *pthread_get_weather(void *arg);
-
 
 
 

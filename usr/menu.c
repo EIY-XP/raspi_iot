@@ -201,7 +201,7 @@ void display_weather(void)
 	for (i = 0; i < 2; i++)
 	{
 		/* 为了防止 获取天气信息 的线程挂掉导致互斥量无法释放 最多尝试2次获取 */
-		if ((flag = pthread_mutex_trylock(&weather_mutex)) != 0)
+		if (0 != (flag = pthread_mutex_trylock(&weather_mutex)))
 		{	
 			delay_sec(2);
 			continue;
@@ -257,6 +257,7 @@ void display_network_info(void)
 		lcd_display_srting(104, 23, (unsigned char*)"not connect");
 	}
 }
+
 
 
 /**
@@ -338,13 +339,13 @@ void *thread_display_device_info(void *arg)
 	unsigned short int   i = 0, j = 0;
 
 	display_menu();
-	delay_sec(12);
+	delay_sec(15);
 	display_cpu_temperature();
 	display_system_calendar();
 	display_network_info();
 	display_weather();
 	
-//	write_log_to_file((char*)"the raspi_iot app start");
+	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
 	{
@@ -352,11 +353,10 @@ void *thread_display_device_info(void *arg)
 		display_cpu_temperature();
 		display_modbus();
 
-		/* 每20分钟重新获取一次天气信息 */	
+		/* 每10分钟重新获取一次天气信息 */	
 		if (i++ == 60) 
 		{
 			display_weather();
-			write_log_to_file((char*)"get weather ok");
 			i = 0;
 		}
 
@@ -364,7 +364,7 @@ void *thread_display_device_info(void *arg)
 		if (j++ == 180)  
 		{
 //			display_network_info();
-//			write_log_to_file((char*)"the raspi_iot app is running");
+			write_log_to_file((char*)"the raspi_iot app is running");
 			j = 0;
 		}
 

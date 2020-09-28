@@ -103,24 +103,25 @@ int read_data_from_file(const char *file_path, char *str)
 {
 	int ret;
 	unsigned short int pos;
-	FILE *fd = fopen(file_path, "r");
+	FILE *fd = fopen(file_path, "r"); //只读方式打开
 	if (NULL == fd)
 		return -1;
 
-	fseek(fd, 0, SEEK_END);
-	pos = ftell(fd);
-	fseek(fd, 0, SEEK_SET);
+	fseek(fd, 0, SEEK_END);  //将文件指针移至文件末尾
+	pos = ftell(fd);  //获取文件长度
+	fseek(fd, 0, SEEK_SET); //将文件指针移至文件开头处
+		
 	ret = fread(str, pos, 1, fd);
 	if (ret <= 0)
 	{
 		fclose(fd);
 		return -1;
 	}
-	str[pos] = '\0';
+	
+	str[pos] = '\0';  //字符串以'/0'结尾
 	fclose(fd);
 	return 0;
 }
-
 
 
 
