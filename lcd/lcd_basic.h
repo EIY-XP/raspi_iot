@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include "lcd_fonts.h"
 #include "lcd_config.h"
+#include "../picture/bmp.h"
 
 #define COLOR_WHITE     0xFFFF  //白色
 #define COLOR_BLACK     0x0000  //黑色   
@@ -73,6 +74,7 @@ void lcd_clear(uint16_t color);
 
 void lcd_display_temp_icon(uint16_t pos_x, uint16_t pos_y, uint8_t *c);
 void lcd_display_icon(uint16_t pos_x, uint16_t pos_y, tBmp *bmp);
+int lcd_display_bmp(uint16_t pos_x, uint16_t pos_y, tMapInof *bmp16);
 void lcd_draw_char8x16(uint16_t pos_x, uint16_t pos_y, uint8_t *c);
 void lcd_draw_char24x48(uint16_t pos_x, uint16_t pos_y, uint8_t *c);
 void lcd_draw_chinese16x16(uint16_t pos_x, uint16_t pos_y, uint8_t *c);

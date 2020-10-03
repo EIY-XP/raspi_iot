@@ -43,6 +43,7 @@
 #include "../lcd/lcd_basic.h"
 #include "../lcd/lcd_driver.h"
 #include "../lcd/lcd_fonts.h"
+#include "../picture/bmp.h"
 
 
 

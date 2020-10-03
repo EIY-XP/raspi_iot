@@ -37,7 +37,7 @@ const char eth0_ip[IP_LENGTH] = "192.168.137.88";  //有线网卡IP地址
 const char *LOG_FILE_PATH = "/home/pi/workstation/eiy-project/config/raspi_iot.txt";
 
 
-tBmp *weather_bmp[20] = 
+tMapInof *weather_bmp[20] = 
 {
 	&weather_code99_bmp53x23_t, //未知天气图标
 	&weather_code0_bmp51x51_t,
@@ -169,7 +169,7 @@ void display_menu(void)
 	lcd_display_srting(55, 41, (unsigned char*)"cpu temp:"); //cpu temp
 	lcd_display_temp_icon(145, 41, bmp16x16_tem_table);        //℃
 
-	lcd_display_icon(2, 116, weather_bmp[0]);   //未知天气图标
+	lcd_display_bmp(2, 116, weather_bmp[0]);   //未知天气图标
 	lcd_set_font(&hzk_font16x16_t);
 	lcd_display_chinese(220, 114, (char*)"天"); //天气信息栏
 	lcd_display_chinese(220, 131, (char*)"气");
@@ -182,6 +182,9 @@ void display_menu(void)
 	lcd_display_chinese(65, 165, (char*)"空气质量");
 	lcd_ctr_backlight(ENABLE);
 	lcd_display_temp_icon(130, 148, bmp16x16_tem_table); //℃
+
+	lcd_display_bmp(100, 200, &bmp16_qq40x40_t);
+	lcd_display_bmp(190, 270, &bmp16_signet50x50_t);
 }
 
 
@@ -211,7 +214,7 @@ void display_weather(void)
 		lcd_get_back_color(&color);   //获取背景颜色
 		lcd_set_font(&hzk_font16x16_t);
 		lcd_write_gram_region(2, 116, 62, 176,color);  //清空显示区
-		lcd_display_icon(2, 116, weather_bmp[weather_code+1]);    //刷新天气图标信息
+		lcd_display_bmp(2, 116, weather_bmp[weather_code+1]);    //刷新天气图标信息
 		lcd_write_gram_region(113, 114, 177, 130, color);  //清空4个汉字显示区
 		lcd_display_chinese(113, 114, (char*)weather_data.name); //刷新城市名称
 		lcd_write_gram_region(113, 131, 177, 147, color);  //清空4个汉字显示区
@@ -345,7 +348,7 @@ void *thread_display_device_info(void *arg)
 	display_network_info();
 	display_weather();
 	
-	write_log_to_file((char*)"the raspi_iot app start");
+//	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
 	{
@@ -364,7 +367,7 @@ void *thread_display_device_info(void *arg)
 		if (j++ == 180)  
 		{
 //			display_network_info();
-			write_log_to_file((char*)"the raspi_iot app is running");
+//			write_log_to_file((char*)"the raspi_iot app is running");
 			j = 0;
 		}
 

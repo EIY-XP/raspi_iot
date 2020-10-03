@@ -9,6 +9,7 @@ DELAY_DIR = ${CUR_DIR}/delay
 COMMON_DIR = ${CUR_DIR}/common
 NETWORK_DIR = ${CUR_DIR}/network
 FILE_DIR = ${CUR_DIR}/file
+PICTURE_DIR = ${CUR_DIR}/picture
 
 #确定头文件所在的文件夹的路径
 INC_DIR = -I${MAIN_DIR} \
@@ -17,7 +18,8 @@ INC_DIR = -I${MAIN_DIR} \
 		  -I${DELAY_DIR} \
 		  -I${COMMON_DIR} \
 		  -I${NETWORK_DIR} \
-		  -I${FILE_DIR}
+		  -I${FILE_DIR} \
+		  -I${PICTURE_DIR}
 
 #查找所有的源文件夹
 SRC = ${wildcard ${MAIN_DIR}/*.c} \
@@ -26,7 +28,8 @@ SRC = ${wildcard ${MAIN_DIR}/*.c} \
       ${wildcard ${DELAY_DIR}/*.c} \
       ${wildcard ${COMMON_DIR}/*.c} \
       ${wildcard ${NETWORK_DIR}/*.c} \
-      ${wildcard ${FILE_DIR}/*.c}
+      ${wildcard ${FILE_DIR}/*.c} \
+      ${wildcard ${PICTURE_DIR}/*.c}
 
 #确定所有的源文件对应的.o文件 patsubst函数为替换函数
 OBJ = ${patsubst %.c,%.o,${SRC}}

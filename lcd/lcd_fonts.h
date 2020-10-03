@@ -54,28 +54,6 @@ extern tFont asc_font24x48_t;
 extern tFont hzk_font16x16_t;
 extern tBmp bmp50x60_raspberry_t;
 
-extern tBmp weather_code0_bmp51x51_t;
-extern tBmp weather_code1_bmp51x52_t;
-extern tBmp weather_code4_bmp60x47_t;
-extern tBmp weather_code5_bmp60x44_t;
-extern tBmp weather_code6_bmp60x51_t;
-extern tBmp weather_code7_bmp60x42_t;
-extern tBmp weather_code8_bmp56x49_t;
-extern tBmp weather_code9_bmp60x40_t;
-extern tBmp weather_code10_bmp60x59_t;
-extern tBmp weather_code11_bmp56x56_t;
-extern tBmp weather_code12_bmp56x56_t;
-extern tBmp weather_code13_bmp56x54_t;
-extern tBmp weather_code14_bmp56x54_t;
-extern tBmp weather_code15_bmp56x54_t;
-extern tBmp weather_code16_bmp56x54_t;
-extern tBmp weather_code17_bmp56x54_t;
-extern tBmp weather_code18_bmp57x54_t;
-extern tBmp weather_code99_bmp53x23_t;
-
-
-
-
 
 int get_asc16_lattice(unsigned char *c, unsigned char *buffer);
 int get_asc48_lattice(unsigned char *c, unsigned char *buffer);

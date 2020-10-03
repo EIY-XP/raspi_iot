@@ -20,7 +20,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "lcd_basic.h"
 #include "lcd_driver.h"
+
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -225,12 +228,10 @@ void lcd_display_temp_icon(uint16_t pos_x, uint16_t pos_y, uint8_t *c)
 
 
 
-
-
- /**
+/**
   * @function : lcd_display_icon
   * @author   : xp
-  * @brief    : 绘画图片 图标
+  * @brief    : 绘画图片 图标 该方法是将已取好字模的图片显示在LCD上
   * @param    : 
   * @retval   : 
   */
@@ -253,6 +254,50 @@ void lcd_display_icon(uint16_t pos_x, uint16_t pos_y, tBmp *bmp)
     pixel = (bmp->table[index*2+1] << 8) | (bmp->table[index*2]);
     lcd_write_data16bit(pixel);
   }
+}
+
+
+
+/**
+  * @function : lcd_display_bmp16
+  * @author   : xp
+  * @brief    : 绘画bmp16格式(RGB565)的图片 图标 该方法是先将bmp16图片提取为二进制文件(xx.bin)
+  *             即去掉了信息头 只取图片数据部分 (二进制文件单独存储)
+  *             数据扫描方式为从左到右 从上到下
+  * @param    : 
+  * @retval   : 
+  */
+int lcd_display_bmp(uint16_t pos_x, uint16_t pos_y, tMapInof *bmp16)
+{
+	unsigned long ret;
+	unsigned char *buffer;
+	unsigned short end_x, end_y;
+  unsigned short pixel;  // 像素值
+  unsigned long index, pixel_total, buffer_total;
+
+	pixel_total = (bmp16->width) * (bmp16->height);  //图片像素总数
+	buffer_total = pixel_total * (bmp16->bit_count / 8);
+	buffer = (unsigned char*)malloc(buffer_total); 
+	
+	if (0 != (ret = bmp16_bin_read(bmp16->picture_path, buffer_total, &buffer)))
+	{
+		free(buffer);
+		return -1;
+	}
+	
+	end_x = pos_x + bmp16->width - 1;
+  end_y = pos_y + bmp16->height - 1;
+
+  lcd_access_gram_region(pos_x, pos_y, end_x, end_y);
+	for (index = 0; index < pixel_total; index++)
+	{
+		pixel = (*(buffer+index*2+1) << 8) | (*(buffer+index*2));
+		lcd_write_data16bit(pixel);
+	}
+
+ 	free(buffer);
+ 	buffer = NULL;
+  return 0;
 }
 
 

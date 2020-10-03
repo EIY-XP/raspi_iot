@@ -71,7 +71,7 @@ tConfig weather_cfg = {0};
 pthread_mutex_t weather_mutex = PTHREAD_MUTEX_INITIALIZER; //互斥锁
 
 /*天气配置文件 程序启动后读取一次配置文件*/
-const char *CFG_PATH = "/home/pi/workstation/eiy-project/config/weather.json";
+const char *CFG_PATH = "/home/pi/workstation/eiy-project/config/weather_config/weather.json";
 
 /* Private variables ---------------------------------------------------------*/
 

@@ -22,6 +22,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "../usr/includes.h"
 
+#include "../picture/bmp.h"
+
 //wiringPi库函数
 #include <wiringPi.h>
 
@@ -61,6 +63,7 @@ int main()
 	
 	if (raspi_iot_init() == -1)
 		exit(-1);
+
 
 	rtu_modbus_poll_start(&tid_modbus);
 	get_weather_info_start(&tid_weather);

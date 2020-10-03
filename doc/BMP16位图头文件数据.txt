@@ -1,0 +1,18 @@
+以下是40x40画幅大小，16位真彩色的bmp图片数据头信息，可以看出16位以上的bmp图片不需要颜色索引表，即从文件偏移量54开始就是位图数据，每个像素2个字节
+fileHeader.bfType = BM
+fileHeader.bfSize = 3254
+fileHeader.bfReserved1 = 0
+fileHeader.bfReserved2 = 0
+fileHeader.bfOffBit = 54
+
+infoHeader.biSize = 40
+infoHeader.biWidth = 40
+infoHeader.biHeight = 40
+infoHeader.biPlanes = 1
+infoHeader.biBitCount = 16
+infoHeader.biCompression = 0
+infoHeader.biSizeImage = 3200
+infoHeader.biXPelsPerMeter = 0
+infoHeader.biYPelsPerMeter = 0
+infoHeader.biClrUsed = 0
+infoHeader.biClrImportant = 0
