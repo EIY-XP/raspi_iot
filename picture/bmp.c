@@ -40,15 +40,9 @@ const char *BMP_PATH = "/home/pi/workstation/eiy-project/config/qq_logo16.bmp";
 
 /* Private functions ---------------------------------------------------------*/
 
-tMapInof bmp16_qq40x40_t = 
-{
-	40,
-	40,
-	16,
-	"/home/pi/workstation/eiy-project/config/qq_logo16.bin",
-};
-
-
+/*
+	印章
+*/
 tMapInof bmp16_signet50x50_t = 
 {
 	50,
@@ -227,9 +221,9 @@ tMapInof weather_code16_bmp56x54_t =
 /*
 	weather code17 大暴雨
 */
-tMapInof weather_code17_bmp56x54_t = 
+tMapInof weather_code17_bmp57x54_t = 
 {
-	56,
+	57,
 	54,
 	16,
 	"/home/pi/workstation/eiy-project/config/weather_config/weather_code17_57x54.bin",

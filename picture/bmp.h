@@ -76,8 +76,6 @@ typedef struct
 	const char *picture_path; //位图存放的路径
 }tMapInof;
 
-
-extern tMapInof bmp16_qq40x40_t;
 extern tMapInof bmp16_signet50x50_t;
 
 extern tMapInof weather_code0_bmp51x51_t;
@@ -95,7 +93,7 @@ extern tMapInof weather_code13_bmp56x54_t;
 extern tMapInof weather_code14_bmp56x54_t;
 extern tMapInof weather_code15_bmp56x54_t;
 extern tMapInof weather_code16_bmp56x54_t;
-extern tMapInof weather_code17_bmp56x54_t;
+extern tMapInof weather_code17_bmp57x54_t;
 extern tMapInof weather_code18_bmp57x54_t;
 extern tMapInof weather_code99_bmp53x23_t;
 

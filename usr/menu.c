@@ -57,7 +57,7 @@ tMapInof *weather_bmp[20] =
 	&weather_code14_bmp56x54_t,
 	&weather_code15_bmp56x54_t,
 	&weather_code16_bmp56x54_t,
-	&weather_code17_bmp56x54_t,
+	&weather_code17_bmp57x54_t,
 	&weather_code18_bmp57x54_t  //特大暴雨图标
 };
 
@@ -183,7 +183,6 @@ void display_menu(void)
 	lcd_ctr_backlight(ENABLE);
 	lcd_display_temp_icon(130, 148, bmp16x16_tem_table); //℃
 
-	lcd_display_bmp(100, 200, &bmp16_qq40x40_t);
 	lcd_display_bmp(190, 270, &bmp16_signet50x50_t);
 }
 
@@ -348,7 +347,7 @@ void *thread_display_device_info(void *arg)
 	display_network_info();
 	display_weather();
 	
-//	write_log_to_file((char*)"the raspi_iot app start");
+	write_log_to_file((char*)"the raspi_iot app start");
 	
 	while (1)
 	{
@@ -367,7 +366,7 @@ void *thread_display_device_info(void *arg)
 		if (j++ == 180)  
 		{
 //			display_network_info();
-//			write_log_to_file((char*)"the raspi_iot app is running");
+			write_log_to_file((char*)"the raspi_iot app is running");
 			j = 0;
 		}
 
