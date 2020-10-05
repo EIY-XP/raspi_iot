@@ -175,8 +175,9 @@ void display_menu(void)
 	lcd_display_temp_icon(145, 41, bmp16x16_tem_table);        //℃
 
 	lcd_set_font(&hzk_font16x16_t);
-	lcd_display_bmp(2, 116, weather_bmp[19]);   //未知天气图标
-	lcd_display_chinese(113, 131, weather[19]); //未知天气
+	lcd_display_chinese(113, 114, (char*)"未知"); //未知城市名称
+	lcd_display_bmp(2, 116, weather_bmp[19]);      //未知天气图标
+	lcd_display_chinese(113, 131, weather[19]);    //未知天气
 	
 	lcd_display_chinese(220, 114, (char*)"天"); //天气信息栏
 	lcd_display_chinese(220, 131, (char*)"气");

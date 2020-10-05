@@ -8,7 +8,9 @@
   -----------------------------------------------------------------------------
   *              Copyright (c) 2020 xxxx,All rights reserved  
   * @description
-  *            
+  *            LCD绘图函数 可显示ASCII字符和HZK汉字以及图片
+  *            字符/汉字 取字模后以数组的方式存储 和 直接使用dos下的字符集(ASC和HZK) 在使用HZK字符集的时候需要转格式
+  *            图片 可使用软件取字模后以数组的方式存储 也可以转换成二进制文件格式(xx.bin) 
   * @history :
   * @date    :
   * @author  :
@@ -144,7 +146,7 @@ void lcd_set_font(tFont *fonts)
   * @param    : 
   * @retval   : 
   */
-tFont* lcd_get_font(void)
+tFont *lcd_get_font(void)
 {
   return current_font;
 }
@@ -196,7 +198,7 @@ void lcd_clear(uint16_t color)
 /**
   * @function : lcd_display_temp_icon
   * @author   : xp
-  * @brief    : 显示摄氏度(℃)图标 大小为16x16
+  * @brief    : 显示摄氏度(℃)图标 大小为16x16 以数组的方式存储在lcd_fonts.c中
   * @param    : 
   * @retval   : 
   */
@@ -232,6 +234,7 @@ void lcd_display_temp_icon(uint16_t pos_x, uint16_t pos_y, uint8_t *c)
   * @function : lcd_display_icon
   * @author   : xp
   * @brief    : 绘画图片 图标 该方法是将已取好字模的图片显示在LCD上
+  *             字模存储在lcd_fonts.c中
   * @param    : 
   * @retval   : 
   */
@@ -259,7 +262,7 @@ void lcd_display_icon(uint16_t pos_x, uint16_t pos_y, tBmp *bmp)
 
 
 /**
-  * @function : lcd_display_bmp16
+  * @function : lcd_display_bmp
   * @author   : xp
   * @brief    : 绘画bmp16格式(RGB565)的图片 图标 该方法是先将bmp16图片提取为二进制文件(xx.bin)
   *             即去掉了信息头 只取图片数据部分 (二进制文件单独存储)
