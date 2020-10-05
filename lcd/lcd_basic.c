@@ -269,8 +269,8 @@ void lcd_display_icon(uint16_t pos_x, uint16_t pos_y, tBmp *bmp)
   */
 int lcd_display_bmp(uint16_t pos_x, uint16_t pos_y, tMapInof *bmp16)
 {
-	unsigned long ret;
-	unsigned char *buffer;
+	int ret;
+	unsigned char *buffer = NULL; //指针赋初值
 	unsigned short end_x, end_y;
   unsigned short pixel;  // 像素值
   unsigned long index, pixel_total, buffer_total;
@@ -278,26 +278,34 @@ int lcd_display_bmp(uint16_t pos_x, uint16_t pos_y, tMapInof *bmp16)
 	pixel_total = (bmp16->width) * (bmp16->height);  //图片像素总数
 	buffer_total = pixel_total * (bmp16->bit_count / 8);
 	buffer = (unsigned char*)malloc(buffer_total); 
-	
-	if (0 != (ret = bmp16_bin_read(bmp16->picture_path, buffer_total, &buffer)))
-	{
-		free(buffer);
-		return -1;
-	}
-	
-	end_x = pos_x + bmp16->width - 1;
-  end_y = pos_y + bmp16->height - 1;
 
-  lcd_access_gram_region(pos_x, pos_y, end_x, end_y);
-	for (index = 0; index < pixel_total; index++)
+	if (NULL != buffer)  //检查指针的有效性
 	{
-		pixel = (*(buffer+index*2+1) << 8) | (*(buffer+index*2));
-		lcd_write_data16bit(pixel);
-	}
+		if (0 != (ret = bmp16_bin_read(bmp16->picture_path, buffer_total, &buffer)))
+	 	{
+			free(buffer);   //释放内存
+			buffer = NULL;  //重新赋值
+		  return -1;
+	 	}
 
- 	free(buffer);
- 	buffer = NULL;
-  return 0;
+		end_x = pos_x + bmp16->width - 1;
+		end_y = pos_y + bmp16->height - 1;
+   	lcd_access_gram_region(pos_x, pos_y, end_x, end_y);
+	 	for (index = 0; index < pixel_total; index++)
+	 	{
+			pixel = (*(buffer+index*2+1) << 8) | (*(buffer+index*2));
+			lcd_write_data16bit(pixel);
+	 	}
+
+	 	free(buffer);
+	 	buffer = NULL;
+	 	return 0;
+	}
+	else
+	{ 
+		free(buffer); //即使是空指针 也可以使用free函数释放
+		return -1;    //内存申请失败 退出
+	}
 }
 
 

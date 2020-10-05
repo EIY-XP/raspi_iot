@@ -100,11 +100,12 @@ int get_weather_info_start(pthread_t *tid)
 	int ret = 0;
 	char config_buf[512] = {0};
 
-	if (0 == (ret = read_data_from_file(CFG_PATH, config_buf)))
+	if (0 == (ret = read_data_from_file(CFG_PATH, config_buf)))  //获取天气配置信息 json格式文件
 	{
-		printf("weather_json is :%s\n", config_buf);
-		if (0 == (ret = cJSON_weatherConfig(config_buf, &weather_cfg)))
+		printf("weather_json is :%s\n", config_buf); //打印json配置信息 调试使用 可去掉
+		if (0 == (ret = cJSON_weatherConfig(config_buf, &weather_cfg))) //解析配置信息
 		{			
+			/*由于线程参数为(void*)类型 即需要类型转换 在函数实体中再次转换即可*/
 			if (pthread_create(tid, NULL, (void*)pthread_get_weather, (void*)&weather_cfg))
     		return -1;  //退出进程
 		}
@@ -147,7 +148,7 @@ void *pthread_get_weather(void *arg)
 
 		delay_sec(tim_per);
 	}
-
+	pthread_exit(NULL);
 }
 
 
@@ -192,7 +193,7 @@ int get_weather(char *location, char *weather_json, tWeather *result)
   ret = recv(sock_fd, WeatherRecvBuf, 1024, 0);  
 	if (ret > 0)
 	{
-//		printf("Server return data is:\n %s\n",WeatherRecvBuf);    
+		printf("Server return data is:\n %s\n",WeatherRecvBuf);    
   	/* 解析天气数据并保存到结构体变量weather_data中 */
   	if (0 == strcmp(weather_json, NOW_JSON))        // 天气实况
     	if (0 != (cJSON_nowWeatherParse(WeatherRecvBuf, result)))
