@@ -193,7 +193,7 @@ int get_weather(char *location, char *weather_json, tWeather *result)
   ret = recv(sock_fd, WeatherRecvBuf, 1024, 0);  
 	if (ret > 0)
 	{
-		printf("Server return data is:\n %s\n",WeatherRecvBuf);    
+		//printf("Server return data is:\n %s\n",WeatherRecvBuf);    
   	/* 解析天气数据并保存到结构体变量weather_data中 */
   	if (0 == strcmp(weather_json, NOW_JSON))        // 天气实况
     	if (0 != (cJSON_nowWeatherParse(WeatherRecvBuf, result)))

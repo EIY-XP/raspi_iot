@@ -59,7 +59,8 @@ int main()
 	pthread_t tid_lcd;
 	pthread_t tid_modbus;
 	pthread_t tid_weather;
-	void *thread_weather_ret = NULL;
+	pthread_t tid_tcp_server;
+	void *thread_ret = NULL;
 	
 	if (raspi_iot_init() == -1)
 		exit(-1);
@@ -68,11 +69,13 @@ int main()
 	rtu_modbus_poll_start(&tid_modbus);
 	get_weather_info_start(&tid_weather);
 	display_device_info_start(&tid_lcd);
+	tcp_server_start(&tid_tcp_server);
 	
 	pthread_detach(tid_lcd);
 	pthread_detach(tid_modbus);
-	pthread_join(tid_weather, &thread_weather_ret);
-	if (*(int*)thread_weather_ret == -1)  //线程异常退出
+	pthread_detach(tid_weather);
+	pthread_join(tid_tcp_server, &thread_ret);
+	if (*(int*)thread_ret == -1)  //线程异常退出
 		exit(-1);
 	
 	while (1)

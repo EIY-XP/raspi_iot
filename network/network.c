@@ -246,40 +246,52 @@ void *thread_tcp_server(void *arg)
 	server_addr.sin_addr.s_addr = inet_addr(LOCAL_IP);
 
 	/*使用TCP通信 IPV4*/
-	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (-1 == socket_fd)
-	{
+	if (-1 == (socket_fd = socket(AF_INET, SOCK_STREAM, 0)))
 		pthread_exit((void*)-1);
-	}
 
 	if (-1 == bind(socket_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)))
-	{
 		pthread_exit((void*)-1);
-	}
 
 	if (-1 == listen(socket_fd, 5))
-	{
 		pthread_exit((void*)-1);
-	}
 
 	/*建立新连接*/
 	length = sizeof(client_addr);
-	new_conn = accept(socket_fd, (struct sockaddr*)&client_addr, &length);
-	if (new_conn < 0)
-	{
-		pthread_exit((void*)-1);
-	}
-
 	while (1)
 	{
-		memset(net_buf, 0, sizeof(net_buf));
-		rev_length = recv(new_conn, net_buf, sizeof(net_buf), 0);
-		send(new_conn, net_buf, rev_length, 0);
+		/*等待连接成功*/
+		new_conn = accept(socket_fd, (struct sockaddr*)&client_addr, &length);
+		if (new_conn > 0)
+		{
+			;
+			printf("accept succeed,new_conn = %d\n", new_conn);
+		}
+		else
+			continue;
+			
+		for (; ;)
+		{
+			memset(net_buf, 0, sizeof(net_buf));
+			rev_length = recv(new_conn, net_buf, sizeof(net_buf), 0);
+			if (rev_length > 0)
+			{
+				printf("recv succeed,rev_length = %d\n", rev_length);
+				send(new_conn, net_buf, rev_length, 0);
+				continue;
+			}
+			else if (rev_length == 0)
+			{
+				printf("socket close, rev_length = %d\n", rev_length);
+				close(new_conn);
+			}
+			else
+				close(new_conn);
+				
+			break;
+		}
 	}
-
-	close(new_conn);
-	close(socket_fd);
 	
+	close(socket_fd);
 	pthread_exit(NULL);
 }
  
